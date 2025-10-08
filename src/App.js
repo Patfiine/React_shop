@@ -1,38 +1,56 @@
 import './App.css';
 import EmployeeAPI from "./api/services";
 import Table from "./Table";
-import React, { useState } from "react"; // импортируем хук useState для управления состоянием
+import React, { useState } from "react";
 
 function App() {
-  //  Инициализируем состояние сотрудников из API
   const [employees, setEmployees] = useState(EmployeeAPI.all());
 
-  //  Функция удаления сотрудника по ID
   const handleDelete = (id) => {
-    EmployeeAPI.delete(id); // удаляем из API
-    setEmployees([...EmployeeAPI.all()]); // обновляем состояние
+    EmployeeAPI.delete(id);
+    setEmployees([...EmployeeAPI.all()]);
   };
 
-  //  Функция добавления нового сотрудника
   const handleAdd = () => {
     const newEmployee = {
-      number: Date.now(), // уникальный ID на основе времени
-      name: "New Employee", // имя по умолчанию
-      job: "Intern", // должность по умолчанию
+      number: Date.now(),
+      name: "New Employee",
+      job: "Intern",
     };
-    EmployeeAPI.add(newEmployee); // добавляем в API
-    setEmployees([...EmployeeAPI.all()]); // обновляем состояние
+    EmployeeAPI.add(newEmployee);
+    setEmployees([...EmployeeAPI.all()]);
+  };
+
+  // Исправленная функция изменения имени
+  const handleEditName = (id, newName) => {
+    console.log('Editing:', id, newName); // для отладки
+    
+    const employeeToUpdate = employees.find(emp => emp.number === id);
+    
+    if (employeeToUpdate) {
+      const updatedEmployee = {
+        ...employeeToUpdate,
+        name: newName
+      };
+      
+      // Вызываем update и проверяем результат
+      const result = EmployeeAPI.update(id, updatedEmployee);
+      console.log('Update result:', result); // для отладки
+      
+      // Обновляем состояние на основе актуальных данных из API
+      setEmployees(EmployeeAPI.all());
+    }
   };
 
   return (
     <div className="App">
       <h1>Shop</h1>
-
-      {/*  Кнопка добавления нового сотрудника */}
       <button onClick={handleAdd}>Add Employee</button>
-
-      {/*  Таблица сотрудников с передачей данных и функции удаления */}
-      <Table employees={employees} onDelete={handleDelete} />
+      <Table 
+        employees={employees} 
+        onDelete={handleDelete}
+        onEditName={handleEditName}
+      />
     </div>
   );
 }
