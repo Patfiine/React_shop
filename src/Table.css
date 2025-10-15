@@ -1,0 +1,200 @@
+.table-container {
+    margin: 20px 0;
+    overflow-x: auto;
+  }
+  
+  .employee-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .employee-table th {
+    background: #667eea;
+    color: white;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+  }
+  
+  .employee-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .employee-row:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .employee-id {
+    font-family: 'Courier New', monospace;
+    color: #666;
+    font-weight: bold;
+  }
+  
+  .employee-name {
+    min-width: 200px;
+  }
+  
+  .employee-job {
+    color: #555;
+    font-style: italic;
+  }
+  
+  .employee-actions {
+    min-width: 120px;
+    text-align: center;
+  }
+  
+  /* Стили для редактирования */
+  .edit-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .edit-input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid #667eea;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  .edit-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+  }
+  
+  .edit-actions {
+    display: flex;
+    gap: 0.25rem;
+  }
+  
+  .save-btn, .cancel-btn {
+    padding: 0.25rem 0.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+  }
+  
+  .save-btn {
+    background: #27ae60;
+    color: white;
+  }
+  
+  .save-btn:hover {
+    background: #219a52;
+  }
+  
+  .cancel-btn {
+    background: #e74c3c;
+    color: white;
+  }
+  
+  .cancel-btn:hover {
+    background: #c0392b;
+  }
+  
+  /* Стили для кнопок */
+  .name-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .edit-btn, .delete-btn {
+    padding: 0.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+  }
+  
+  .edit-btn {
+    background: #f39c12;
+    color: white;
+  }
+  
+  .edit-btn:hover {
+    background: #e67e22;
+  }
+  
+  .delete-btn {
+    background: #e74c3c;
+    color: white;
+  }
+  
+  .delete-btn:hover {
+    background: #c0392b;
+  }
+  
+  /* Сообщения о правах доступа */
+  .no-permission {
+    color: #7f8c8d;
+    font-size: 0.8rem;
+    font-style: italic;
+  }
+  
+  .no-data {
+    text-align: center;
+    padding: 3rem;
+    color: #7f8c8d;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .no-data p {
+    margin: 0.5rem 0;
+  }
+  
+  .table-info {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    text-align: center;
+  }
+  
+  .table-info p {
+    margin: 0.25rem 0;
+  }
+  
+  .admin-info {
+    color: #27ae60;
+    font-weight: bold;
+  }
+  
+  .user-info {
+    color: #f39c12;
+    font-weight: bold;
+  }
+  
+  /* Адаптивность */
+  @media (max-width: 768px) {
+    .employee-table {
+      font-size: 0.9rem;
+    }
+    
+    .employee-table th,
+    .employee-table td {
+      padding: 0.5rem;
+    }
+    
+    .edit-container {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    
+    .name-container {
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: flex-start;
+    }
+  }
