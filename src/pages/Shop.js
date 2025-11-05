@@ -33,7 +33,7 @@ export default function Shop() {
   return (
     <main style={{padding: 20}}>
       <h1>О магазине — Товары</h1>
-      <p>Здесь представлен список товаров.</p>
+      <p>Здесь представлен список товаров!</p>
 
       <div style={{display:'flex', flexWrap:'wrap', marginTop: 12}}>
         {products.map(p => <ProductCard key={p.id} p={p} />)}
