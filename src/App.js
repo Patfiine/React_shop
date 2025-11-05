@@ -1,4 +1,6 @@
 import './App.css';
+import Shop from "./pages/Shop";
+import Tables from "./pages/Tables";
 import EmployeeAPI from "./api/services";
 import Table from "./Table";
 import LoginForm from "./components/LoginForm.js";
@@ -113,7 +115,7 @@ function App() {
     <Router>
       <div className="App">
         <div className="app-header">
-          <h1>Shop Management System</h1>
+          <h1>Shop Management System б/у</h1>
           <div className="user-info">
             <span>Добро пожаловать, {user}!</span>
             
@@ -132,6 +134,33 @@ function App() {
               >
                 Сотрудники
               </Link>
+              <Link 
+  to="/shop" 
+  style={{ 
+    marginRight: '15px',
+    textDecoration: 'none',
+    color: 'black',
+    padding: '5px 10px',
+    border: '1px solid white',
+    borderRadius: '3px'
+  }}
+>
+  Товары
+</Link>
+<Link 
+  to="/tables"
+  style={{
+    marginRight: '15px',
+    textDecoration: 'none',
+    color: 'black',
+    padding: '5px 10px',
+    border: '1px solid white',
+    borderRadius: '3px'
+  }}
+>
+  Таблицы
+</Link>
+
               <Link 
                 to="/about" 
                 style={{ 
@@ -170,6 +199,8 @@ function App() {
             
             {/* Страница "О магазине" */}
             <Route path="/about" element={<About />} />
+            <Route path="/shop" element={<Shop />} />
+            <Route path="/tables" element={<Tables />} />
           </Routes>
         </div>
       </div>
