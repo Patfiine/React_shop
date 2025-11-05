@@ -63,6 +63,13 @@ const products = [
     price: 6500,
     description: "Процессор m4pro 24/512",
     image: "/images/"
+  },
+  {
+    id: 10,
+    title: "Macbook air 15",
+    price: 3450,
+    description: "Процессор m4 16/256",
+    image: "/images/air.jpeg"
   }
 ];
 

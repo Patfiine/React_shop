@@ -1,5 +1,4 @@
-// src/pages/Shop.js
-import React from "react";
+import React, { useState } from "react";
 import products from "../data/products";
 import { Link } from "react-router-dom";
 
@@ -30,14 +29,58 @@ function ProductCard({ p }) {
 }
 
 export default function Shop() {
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
+  const categories = [
+    { id: 'pro', title: 'MacBook Pro', image: '/images/m3 silver.jpeg' },
+    { id: 'air', title: 'MacBook Air', image: '/images/air.jpeg' } 
+  ];
+
+  const filteredProducts = selectedCategory
+    ? products.filter(p => p.title.toLowerCase().includes(selectedCategory))
+    : [];
+
   return (
     <main style={{padding: 20}}>
       <h1>О магазине — Товары</h1>
-      <p>Здесь представлен список товаров!</p>
 
-      <div style={{display:'flex', flexWrap:'wrap', marginTop: 12}}>
-        {products.map(p => <ProductCard key={p.id} p={p} />)}
-      </div>
+      {!selectedCategory ? (
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          flexWrap: 'wrap',
+          gap: '20px',
+          marginTop: '50px'
+        }}>
+          {categories.map(cat => (
+            <div 
+              key={cat.id} 
+              style={{
+                border: '1px solid #e6e6e6',
+                borderRadius: 8,
+                padding: 12,
+                width: 260,
+                background: '#fff',
+                cursor: 'pointer',
+                textAlign: 'center'
+              }}
+              onClick={() => setSelectedCategory(cat.id)}
+            >
+              <div style={{height: 140, display: 'flex', alignItems:'center', justifyContent:'center'}}>
+                <img src={cat.image} alt={cat.title} style={{maxWidth:'100%', maxHeight:'100%'}} />
+              </div>
+              <h3 style={{margin: '8px 0'}}>{cat.title}</h3>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div>
+          <button onClick={() => setSelectedCategory(null)} style={{marginBottom: 20}}>← Назад к категориям</button>
+          <div style={{display:'flex', flexWrap:'wrap', justifyContent:'center', gap: '20px'}}>
+            {filteredProducts.map(p => <ProductCard key={p.id} p={p} />)}
+          </div>
+        </div>
+      )}
     </main>
   );
 }
