@@ -60,47 +60,53 @@ const Table = ({ employees, onDelete, onEditName, isAdmin }) => {
             <tr key={employee.number} className="employee-row">
               <td className="employee-id">{employee.number}</td>
               
-              <td className="employee-name">
-                {editingId === employee.number ? (
-                  <div className="edit-container">
-                    <input
-                      type="text"
-                      value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
-                      onKeyDown={(e) => handleKeyPress(e, employee.number)}
-                      className="edit-input"
-                      autoFocus
-                    />
-                    <div className="edit-actions">
-                      <button 
-                        onClick={() => handleSaveClick(employee.number)}
-                        className="save-btn"
-                        title="Сохранить"
-                      >
-                        ✓
-                      </button>
-                      <button 
-                        onClick={handleCancelClick}
-                        className="cancel-btn"
-                        title="Отменить"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="name-container">
-                    <span>{employee.name}</span>
-                    <button 
-                      onClick={() => handleEditClick(employee)}
-                      className="edit-btn"
-                      title="Редактировать имя"
-                    >
-                      ✏️
-                    </button>
-                  </div>
-                )}
-              </td>
+             <td className="employee-name">
+  {editingId === employee.number ? (
+    <div className="edit-container">
+      <input
+        type="text"
+        value={editValue}
+        onChange={(e) => setEditValue(e.target.value)}
+        onKeyDown={(e) => handleKeyPress(e, employee.number)}
+        className="edit-input"
+        autoFocus
+        disabled={!isAdmin} // запрещаем ввод для обычного пользователя
+      />
+      {isAdmin && (
+        <div className="edit-actions">
+          <button 
+            onClick={() => handleSaveClick(employee.number)}
+            className="save-btn"
+            title="Сохранить"
+          >
+            ✓
+          </button>
+          <button 
+            onClick={handleCancelClick}
+            className="cancel-btn"
+            title="Отменить"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+    </div>
+  ) : (
+    <div className="name-container">
+      <span>{employee.name}</span>
+      {isAdmin && (
+        <button 
+          onClick={() => handleEditClick(employee)}
+          className="edit-btn"
+          title="Редактировать имя"
+        >
+          ✏️
+        </button>
+      )}
+    </div>
+  )}
+</td>
+
               
               <td className="employee-job">{employee.job}</td>
               

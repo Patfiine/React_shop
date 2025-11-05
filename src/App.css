@@ -5,17 +5,36 @@
 
 .app-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid #eee;
+  flex-wrap: wrap;            /* Позволяет переносить элементы */
+  align-items: center;        /* Вертикальное выравнивание */
+  justify-content: space-between; /* Заголовок слева, остальные элементы справа */
+  padding: 10px 20px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .app-header h1 {
-  color: #333;
   margin: 0;
+  font-size: 20px;
+  flex: 1;           /* Заголовок занимает всю доступную ширину */
+  min-width: 150px;  /* Минимальная ширина, чтобы не съезжал */
 }
+
+.app-header .user-info {
+  display: flex;
+  flex-wrap: wrap;       /* Элементы внутри могут переноситься */
+  align-items: center;
+  justify-content: flex-end; /* Прижимает элементы к правому краю */
+  gap: 10px;             /* Расстояние между ссылками и кнопкой выхода */
+  min-width: 150px;      /* Чтобы блок не "съезжал" полностью */
+}
+
+.app-header nav {
+  display: flex;
+  flex-wrap: wrap;       /* Ссылки в nav тоже могут переноситься */
+  gap: 10px;             /* Расстояние между ссылками */
+}
+
 
 .user-info {
   display: flex;
