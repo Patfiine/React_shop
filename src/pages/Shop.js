@@ -11,7 +11,7 @@ function ProductCard({ p }) {
       width: 260,
       margin: 10,
       boxSizing: 'border-box',
-      background: '#fff'
+      background: '#ffffffff'
     }}>
       <div style={{height: 140, display: 'flex', alignItems:'center', justifyContent:'center', overflow:'hidden'}}>
         {p.image ? <img src={p.image} alt={p.title} style={{maxWidth:'100%', maxHeight:'100%'}} /> : <div style={{color:'#999'}}>Нет изображения</div>}
@@ -33,7 +33,9 @@ export default function Shop() {
 
   const categories = [
     { id: 'pro', title: 'MacBook Pro', image: '/images/m3 silver.jpeg' },
-    { id: 'air', title: 'MacBook Air', image: '/images/air.jpeg' } 
+    { id: 'air', title: 'MacBook Air', image: '/images/air.jpeg' },
+    { id: 'Iphone', title: 'Iphone', image: '/images/iphone.png' },
+    { id: 'Iphone Pro', title: 'Iphone Pro', image: '/images/iphone pro.png' } 
   ];
 
   const filteredProducts = selectedCategory

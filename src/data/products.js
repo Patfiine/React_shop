@@ -66,8 +66,22 @@ const products = [
   },
   {
     id: 10,
+    title: "Macbook Pro 16",
+    price: 4000,
+    description: "Процессор m1 max 32/1024",
+    image: "/images/m1max silver.jpg"
+  },
+  {
+    id: 11,
     title: "Macbook air 15",
     price: 3450,
+    description: "Процессор m4 16/256",
+    image: "/images/air.jpeg"
+  },
+   {
+    id: 12,
+    title: "Macbook air 13",
+    price: 3000,
     description: "Процессор m4 16/256",
     image: "/images/air.jpeg"
   }
