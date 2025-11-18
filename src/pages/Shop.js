@@ -34,7 +34,7 @@ export default function Shop() {
   const categories = [
     { id: 'macbook-pro', title: 'MacBook Pro', image: '/images/m3 silver.jpeg' },
     { id: 'macbook-air', title: 'MacBook Air', image: '/images/air.jpeg' },
-    { id: 'iphone-base', title: 'Iphone', image: '/images/iphone.png' },
+    { id: 'iphone-base', title: 'Iphone', image: '/images/iphone2.png' },
      { id: 'iphone-pro', title: 'Iphone Pro', image: '/images/iphone pro.png' },
     
   ];
@@ -45,7 +45,7 @@ export default function Shop() {
 
   return (
     <main style={{padding: 20}}>
-      <h1>О магазине — Товары</h1>
+      <h1>Актуальные товары</h1>
 
       {!selectedCategory ? (
         <div style={{

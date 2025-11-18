@@ -111,7 +111,7 @@ const products = [
     title: "Iphone 17",
     price: 2680,
     description: "512 GB",
-    image: "/images/iphone.png"
+    image: "/images/iphone2.png"
   },
     {
     id: 15,
@@ -127,7 +127,7 @@ const products = [
     title: "Iphone 16",
     price: 1900,
     description: "128 GB",
-    image: "/images/iphone.png"
+    image: "/images/iphone2.png"
   },
     {
     id: 17,
@@ -143,7 +143,7 @@ const products = [
     title: "Iphone 16",
     price: 2200,
     description: "256 GB",
-    image: "/images/iphone.png"
+    image: "/images/iphone2.png"
   },
    {
     id: 19,
