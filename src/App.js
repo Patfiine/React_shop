@@ -5,7 +5,10 @@ import EmployeeAPI from "./api/services";
 import Table from "./Table";
 import LoginForm from "./components/LoginForm.js";
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, NavLink, Navigate } from 'react-router-dom';
+
+
+
 
 // Создаем компонент About страницы
 const About = () => {
@@ -82,7 +85,7 @@ function App() {
     }
     const newEmployee = {
       number: Date.now(),
-      name: "New Employee",
+      name: "Новый сотрудник",
       job: "Intern",
     };
     EmployeeAPI.add(newEmployee);
@@ -113,99 +116,48 @@ function App() {
 
   return (
     <Router>
-      <div className="App">
-        <div className="app-header">
-          <h1>Shop Management System б/у</h1>
-          <div className="user-info">
-            <span>Добро пожаловать, {user}!</span>
-            
-            {/* Добавляем навигацию */}
-            <nav style={{ display: 'inline-block', marginLeft: '20px' }}>
-              <Link 
-                to="/" 
-                style={{ 
-                  marginRight: '15px', 
-                  textDecoration: 'none',
-                  color: 'black',
-                  padding: '5px 10px',
-                  border: '1px solid white',
-                  borderRadius: '3px'
-                }}
-              >
-                Сотрудники
-              </Link>
-              <Link 
-  to="/shop" 
-  style={{ 
-    marginRight: '15px',
-    textDecoration: 'none',
-    color: 'black',
-    padding: '5px 10px',
-    border: '1px solid white',
-    borderRadius: '3px'
-  }}
->
-  Товары
-</Link>
-<Link 
-  to="/tables"
-  style={{
-    marginRight: '15px',
-    textDecoration: 'none',
-    color: 'black',
-    padding: '5px 10px',
-    border: '1px solid white',
-    borderRadius: '3px'
-  }}
->
-  Таблицы
-</Link>
+  <div className="App">
 
-              <Link 
-                to="/about" 
-                style={{ 
-                  textDecoration: 'none',
-                  color: 'black',
-                  padding: '5px 10px',
-                  border: '1px solid white',
-                  borderRadius: '3px'
-                }}
-              >
-                О магазине
-              </Link>
-            </nav>
-            
-            <button onClick={handleLogout} className="logout-btn">Выйти</button>
-          </div>
-        </div>
-        
-        <div className="app-content">
-          <Routes>
-            {/* Главная страница с таблицей сотрудников */}
-            <Route path="/" element={
-              <div>
-                {isAdmin && (
-                  <button onClick={handleAdd} className="add-btn">Add Employee</button>
-                )}
-                
-                <Table 
-                  employees={employees} 
-                  onDelete={isAdmin ? handleDelete : null}
-                  onEditName={handleEditName}
-                  isAdmin={isAdmin}
-                />
-              </div>
-            } />
-            
-            {/* Страница "О магазине" */}
-            <Route path="/about" element={<About />} />
-            <Route path="/shop" element={<Shop />} />
-            <Route path="/tables" element={<Tables />} />
-          </Routes>
+    {/* --- Header --- */}
+    <div className="app-header">
+      <div className="header-top">
+        <h1 className="header-title">Shop Management System</h1>
+        <div className="user-info">
+          <span>Добро пожаловать, {user}!</span>
+          {isAdmin && <span>(Admin)</span>}
         </div>
       </div>
-    </Router>
+
+      <div className="header-bottom">
+        <nav className="header-nav">
+          <NavLink to="/employees" className={({ isActive }) => isActive ? 'active' : ''}>Сотрудники</NavLink>
+          <NavLink to="/shop" className={({ isActive }) => isActive ? 'active' : ''}>Товары</NavLink>
+          <NavLink to="/tables" className={({ isActive }) => isActive ? 'active' : ''}>Таблицы</NavLink>
+          <NavLink to="/about" className={({ isActive }) => isActive ? 'active' : ''}>О магазине</NavLink>
+        </nav>
+        <button onClick={handleLogout} className="logout-btn">Выйти</button>
+      </div>
+    </div>
+
+    {/* --- Контент --- */}
+    <div className="app-content">
+      <Routes>
+        <Route path="/" element={<Navigate to="/shop" replace />} />
+        <Route path="/shop" element={<Shop />} />
+        <Route path="/employees" element={
+          <div>
+            {isAdmin && <button onClick={handleAdd} className="add-btn">Добавить сотрудника</button>}
+            <Table employees={employees} onDelete={isAdmin ? handleDelete : null} onEditName={handleEditName} isAdmin={isAdmin} />
+          </div>
+        } />
+        <Route path="/tables" element={<Tables />} />
+        <Route path="/about" element={<About />} />
+      </Routes>
+    </div>
+
+  </div>
+</Router>
   );
-}
+}//
 
 export default App;

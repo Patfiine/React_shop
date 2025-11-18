@@ -37,7 +37,7 @@ const Table = ({ employees, onDelete, onEditName, isAdmin }) => {
         <div className="no-data">
           <p>Нет данных о сотрудниках</p>
           {isAdmin && (
-            <p>Нажмите "Add Employee" чтобы добавить первого сотрудника</p>
+            <p>Нажмите "Добавить сотрудника" чтобы добавить первого сотрудника</p>
           )}
         </div>
       </div>

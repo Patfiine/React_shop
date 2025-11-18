@@ -5,51 +5,65 @@
 
 .app-header {
   display: flex;
-  flex-wrap: wrap;            /* Позволяет переносить элементы */
-  align-items: center;        /* Вертикальное выравнивание */
-  justify-content: space-between; /* Заголовок слева, остальные элементы справа */
+  flex-direction: column; /* Для мобильной версии сначала */
+  gap: 10px;
   padding: 10px 20px;
   box-sizing: border-box;
   width: 100%;
+  background-color: #e5e3e3;
 }
 
-.app-header h1 {
+.header-top {
+  display: flex;
+  justify-content: space-between; /* Заголовок слева, приветствие справа */
+  align-items: center;
+}
+
+.header-title {
   margin: 0;
   font-size: 20px;
-  flex: 1;           /* Заголовок занимает всю доступную ширину */
-  min-width: 150px;  /* Минимальная ширина, чтобы не съезжал */
+  font-weight: bold;
 }
-
-.app-header .user-info {
-  display: flex;
-  flex-wrap: wrap;       /* Элементы внутри могут переноситься */
-  align-items: center;
-  justify-content: flex-end; /* Прижимает элементы к правому краю */
-  gap: 10px;             /* Расстояние между ссылками и кнопкой выхода */
-  min-width: 150px;      /* Чтобы блок не "съезжал" полностью */
-}
-
-.app-header nav {
-  display: flex;
-  flex-wrap: wrap;       /* Ссылки в nav тоже могут переноситься */
-  gap: 10px;             /* Расстояние между ссылками */
-}
-
 
 .user-info {
   display: flex;
   align-items: center;
   gap: 1rem;
+  font-weight: bold;
+  color: #cd7e7e;
 }
 
-.user-info span {
-  font-weight: bold;
-  color: #555;
+.header-bottom {
+  display: flex;
+  justify-content: space-between; /* пространство между nav и кнопкой выхода */
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Навигация по центру */
+.header-nav {
+  display: flex;
+  gap: 10px;
+  flex: 1;                     /* nav занимает всё доступное место */
+  justify-content: center;      /* выравнивание по центру */
+}
+
+.header-nav a {
+  text-decoration: none;
+  color: black;
+  padding: 5px 10px;
+  border-radius: 3px;
+  border: 1px solid white;
+}
+
+.header-nav a.active {
+  color: white;
+  background-color: rgb(39, 158, 103);
 }
 
 .logout-btn {
   padding: 0.5rem 1rem;
-  background: #e74c3c;
+  background: #cc493a;
   color: white;
   border: none;
   border-radius: 5px;
@@ -58,7 +72,7 @@
 }
 
 .logout-btn:hover {
-  background: #c0392b;
+  background: #e7664f;
 }
 
 .add-btn {
@@ -70,6 +84,7 @@
   font-size: 1rem;
   cursor: pointer;
   margin-bottom: 1rem;
+    margin-top: 1rem; /* добавит отступ сверху */
   transition: background 0.3s;
 }
 
@@ -80,4 +95,25 @@
 .app-content {
   max-width: 1200px;
   margin: 0 auto;
+}
+
+/* --- Адаптив --- */
+@media (max-width: 768px) {
+  .header-top {
+    flex-direction: column; /* Заголовок сверху, приветствие ниже */
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  .header-bottom {
+    flex-direction: row; /* Навигация и кнопка выхода в одной строке */
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .header-nav {
+    flex-wrap: wrap;
+  }
 }
