@@ -6,6 +6,9 @@ import Table from "./Table";
 import LoginForm from "./components/LoginForm.js";
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, NavLink, Navigate } from 'react-router-dom';
+import Button from "@mui/material/Button";
+import Basket from "./pages/Basket"; 
+
 
 
 
@@ -91,6 +94,28 @@ function App() {
     EmployeeAPI.add(newEmployee);
     setEmployees([...EmployeeAPI.all()]);
   };
+  
+
+// --- добавляем состояние корзины в App ---
+const [basket, setBasket] = useState(() => {
+  return JSON.parse(localStorage.getItem("basket") || "[]");
+});
+
+// Функция добавления товара в корзину
+const addToBasket = (product) => {
+  const updated = [...basket, product];
+  setBasket(updated);
+  localStorage.setItem("basket", JSON.stringify(updated));
+};
+
+// Функция удаления товара из корзины
+const handleRemoveFromBasket = (product) => {
+  const updated = basket.filter(item => item !== product);
+  setBasket(updated);
+  localStorage.setItem("basket", JSON.stringify(updated));
+};
+
+
 
   const handleEditName = (id, newName) => {
     console.log('Editing:', id, newName);
@@ -134,25 +159,42 @@ function App() {
           <NavLink to="/shop" className={({ isActive }) => isActive ? 'active' : ''}>Товары</NavLink>
           <NavLink to="/tables" className={({ isActive }) => isActive ? 'active' : ''}>Таблицы</NavLink>
           <NavLink to="/about" className={({ isActive }) => isActive ? 'active' : ''}>О магазине</NavLink>
+           <NavLink to="/basket" className={({ isActive }) => isActive ? 'active' : ''}>Корзина</NavLink>
         </nav>
-        <button onClick={handleLogout} className="logout-btn">Выйти</button>
+
+        <Button 
+  variant="outlined" 
+  color="error" 
+  onClick={handleLogout}
+>
+  Выйти
+</Button>
+
       </div>
     </div>
 
     {/* --- Контент --- */}
     <div className="app-content">
       <Routes>
-        <Route path="/" element={<Navigate to="/shop" replace />} />
-        <Route path="/shop" element={<Shop />} />
-        <Route path="/employees" element={
-          <div>
-            {isAdmin && <button onClick={handleAdd} className="add-btn">Добавить сотрудника</button>}
-            <Table employees={employees} onDelete={isAdmin ? handleDelete : null} onEditName={handleEditName} isAdmin={isAdmin} />
-          </div>
-        } />
-        <Route path="/tables" element={<Tables />} />
-        <Route path="/about" element={<About />} />
-      </Routes>
+  <Route path="/" element={<Navigate to="/shop" replace />} />
+  
+  {/* Передаем addToBasket в Shop */}
+  <Route path="/shop" element={<Shop addToBasket={addToBasket} />} />
+
+  <Route path="/employees" element={
+    <div>
+      {isAdmin && <button onClick={handleAdd} className="add-btn">Добавить сотрудника</button>}
+      <Table employees={employees} onDelete={isAdmin ? handleDelete : null} onEditName={handleEditName} isAdmin={isAdmin} />
+    </div>
+  } />
+
+  <Route path="/tables" element={<Tables />} />
+  <Route path="/about" element={<About />} />
+
+  {/* Корзина получает basket и функцию удаления */}
+  <Route path="/basket" element={<Basket basketItems={basket} onRemove={handleRemoveFromBasket} />} />
+</Routes>
+
     </div>
 
   </div>
