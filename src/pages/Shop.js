@@ -21,69 +21,30 @@ export default function Shop({ addToBasket }) {
       <h1>О магазине — Товары</h1>
 
       {!selectedCategory ? (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            flexWrap: "wrap",
-            gap: "20px",
-            marginTop: "50px",
-          }}
-        >
+        <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
           {categories.map((cat) => (
-            <div
-              key={cat.id}
-              style={{
-                border: "1px solid #e6e6e6",
-                borderRadius: 8,
-                padding: 12,
-                width: 260,
-                background: "#fff",
-                cursor: "pointer",
-                textAlign: "center",
-              }}
-              onClick={() => setSelectedCategory(cat.id)}
-            >
-              <div
-                style={{
-                  height: 140,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <img
-                  src={cat.image}
-                  alt={cat.title}
-                  style={{ maxWidth: "100%", maxHeight: "100%" }}
-                />
-              </div>
-              <h3 style={{ margin: "8px 0" }}>{cat.title}</h3>
+            <div key={cat.id} onClick={() => setSelectedCategory(cat.id)}>
+              <img src={cat.image} alt={cat.title} width={200} />
+              <h3>{cat.title}</h3>
             </div>
           ))}
         </div>
       ) : (
-        <div>
-          <button
-            onClick={() => setSelectedCategory(null)}
-            style={{ marginBottom: 20 }}
-          >
-            ← Назад к категориям
+        <>
+          <button onClick={() => setSelectedCategory(null)}>
+            ← Назад
           </button>
 
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "center",
-              gap: "20px",
-            }}
-          >
+          <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
             {filteredProducts.map((p) => (
-              <ProductCard key={p.id} product={p} onAddToBasket={addToBasket} />
+              <ProductCard
+                key={p.id}
+                product={p}
+                onAddToBasket={addToBasket}
+              />
             ))}
           </div>
-        </div>
+        </>
       )}
     </main>
   );

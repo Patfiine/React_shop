@@ -186,7 +186,7 @@ const products = [
     image: "/images/iphone pro.png"
   },
    {
-    id: 15,
+    id: 24,
     categoryId: "iphone-pro",
     title: "Iphone 17 Pro",
     price: 4350,
