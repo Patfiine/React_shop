@@ -1,65 +1,70 @@
-import './App.css';
+import "./App.css";
+import React, { useState, useEffect } from "react";
+
+import { BrowserRouter as Router, Routes, Route, NavLink, Navigate } from "react-router-dom";
+import Button from "@mui/material/Button";
+
+// pages
 import Shop from "./pages/Shop";
 import Tables from "./pages/Tables";
+import BasketPage from "./pages/BasketPage";
+
+// components
+import LoginForm from "./components/LoginForm";
+import Notification from "./components/Notification";
+
+// employees
 import EmployeeAPI from "./api/services";
 import Table from "./Table";
-import LoginForm from "./components/LoginForm.js";
-import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, NavLink, Navigate } from 'react-router-dom';
-import Button from "@mui/material/Button";
-import Basket from "./pages/Basket"; 
 
-
-
-
-
-// Создаем компонент About страницы
+// --- About page ---
 const About = () => {
   return (
-    <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
+    <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
       <h2>О нашем магазине</h2>
       <p>Добро пожаловать в систему управления магазином!</p>
       <p>Здесь вы можете управлять сотрудниками и просматривать информацию о магазине.</p>
-      <div style={{ marginTop: '20px' }}>
-        <h3>Наши возможности:</h3>
-        <ul>
-          <li>Просмотр списка сотрудников</li>
-          <li>Добавление новых сотрудников (для администраторов)</li>
-          <li>Редактирование информации о сотрудниках</li>
-          <li>Удаление сотрудников (для администраторов)</li>
-        </ul>
-      </div>
+      <ul>
+        <li>Просмотр списка сотрудников</li>
+        <li>Добавление сотрудников (администратор)</li>
+        <li>Редактирование данных</li>
+        <li>Удаление сотрудников</li>
+      </ul>
     </div>
   );
 };
 
 function App() {
-  const [employees, setEmployees] = useState([]);
+  // --- auth ---
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [user, setUser] = useState(null);
 
+  // --- employees ---
+  const [employees, setEmployees] = useState([]);
+
   useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    const savedIsAdmin = localStorage.getItem('isAdmin');
-    
+    const savedUser = localStorage.getItem("user");
+    const savedIsAdmin = localStorage.getItem("isAdmin");
+
     if (savedUser) {
       setUser(savedUser);
       setIsLoggedIn(true);
-      setIsAdmin(savedIsAdmin === 'true');
+      setIsAdmin(savedIsAdmin === "true");
       setEmployees(EmployeeAPI.all());
     }
   }, []);
 
   const handleLogin = (adminStatus) => {
-    const username = adminStatus ? 'admin' : 'user';
+    const username = adminStatus ? "admin" : "user";
+
     setUser(username);
     setIsLoggedIn(true);
     setIsAdmin(adminStatus);
     setEmployees(EmployeeAPI.all());
-    
-    localStorage.setItem('user', username);
-    localStorage.setItem('isAdmin', adminStatus);
+
+    localStorage.setItem("user", username);
+    localStorage.setItem("isAdmin", adminStatus);
   };
 
   const handleLogout = () => {
@@ -67,139 +72,113 @@ function App() {
     setIsAdmin(false);
     setUser(null);
     setEmployees([]);
-    
-    localStorage.removeItem('user');
-    localStorage.removeItem('isAdmin');
+
+    localStorage.removeItem("user");
+    localStorage.removeItem("isAdmin");
   };
 
+  // --- employees actions ---
   const handleDelete = (id) => {
     if (!isAdmin) {
-      alert('Только администратор может удалять сотрудников');
+      alert("Только администратор может удалять сотрудников");
       return;
     }
     EmployeeAPI.delete(id);
-    setEmployees([...EmployeeAPI.all()]);
+    setEmployees(EmployeeAPI.all());
   };
 
   const handleAdd = () => {
     if (!isAdmin) {
-      alert('Только администратор может добавлять сотрудников');
+      alert("Только администратор может добавлять сотрудников");
       return;
     }
-    const newEmployee = {
+
+    EmployeeAPI.add({
       number: Date.now(),
       name: "Новый сотрудник",
       job: "Intern",
-    };
-    EmployeeAPI.add(newEmployee);
-    setEmployees([...EmployeeAPI.all()]);
+    });
+
+    setEmployees(EmployeeAPI.all());
   };
-  
-
-// --- добавляем состояние корзины в App ---
-const [basket, setBasket] = useState(() => {
-  return JSON.parse(localStorage.getItem("basket") || "[]");
-});
-
-// Функция добавления товара в корзину
-const addToBasket = (product) => {
-  const updated = [...basket, product];
-  setBasket(updated);
-  localStorage.setItem("basket", JSON.stringify(updated));
-};
-
-// Функция удаления товара из корзины
-const handleRemoveFromBasket = (product) => {
-  const updated = basket.filter(item => item !== product);
-  setBasket(updated);
-  localStorage.setItem("basket", JSON.stringify(updated));
-};
-
-
 
   const handleEditName = (id, newName) => {
-    console.log('Editing:', id, newName);
-    
-    const employeeToUpdate = employees.find(emp => emp.number === id);
-    
-    if (employeeToUpdate) {
-      const updatedEmployee = {
-        ...employeeToUpdate,
-        name: newName
-      };
-      
-      const result = EmployeeAPI.update(id, updatedEmployee);
-      console.log('Update result:', result);
-      
-      setEmployees(EmployeeAPI.all());
-    }
+    const employee = employees.find((e) => e.number === id);
+    if (!employee) return;
+
+    EmployeeAPI.update(id, { ...employee, name: newName });
+    setEmployees(EmployeeAPI.all());
   };
 
+  // --- auth guard ---
   if (!isLoggedIn) {
     return <LoginForm onLogin={handleLogin} />;
   }
 
   return (
     <Router>
-  <div className="App">
+      <div className="App">
+        {/* ===== HEADER ===== */}
+        <div className="app-header">
+          <div className="header-top">
+            <h1 className="header-title">Shop Management System</h1>
+            <div className="user-info">
+              <span>Добро пожаловать, {user}!</span>
+              {isAdmin && <span> (Admin)</span>}
+            </div>
+          </div>
 
-    {/* --- Header --- */}
-    <div className="app-header">
-      <div className="header-top">
-        <h1 className="header-title">Shop Management System</h1>
-        <div className="user-info">
-          <span>Добро пожаловать, {user}!</span>
-          {isAdmin && <span>(Admin)</span>}
+          <div className="header-bottom">
+            <nav className="header-nav">
+              <NavLink to="/employees">Сотрудники</NavLink>
+              <NavLink to="/shop">Товары</NavLink>
+              <NavLink to="/tables">Таблицы</NavLink>
+              <NavLink to="/about">О магазине</NavLink>
+              <NavLink to="/basket">Корзина</NavLink>
+            </nav>
+
+            <Button variant="outlined" color="error" onClick={handleLogout}>
+              Выйти
+            </Button>
+          </div>
         </div>
+
+        {/* ===== CONTENT ===== */}
+        <div className="app-content">
+          <Routes>
+            <Route path="/" element={<Navigate to="/shop" replace />} />
+
+            <Route path="/shop" element={<Shop />} />
+            <Route path="/basket" element={<BasketPage />} />
+            <Route path="/tables" element={<Tables />} />
+            <Route path="/about" element={<About />} />
+
+            <Route
+              path="/employees"
+              element={
+                <div>
+                  {isAdmin && (
+                    <button onClick={handleAdd} className="add-btn">
+                      Добавить сотрудника
+                    </button>
+                  )}
+                  <Table
+                    employees={employees}
+                    onDelete={isAdmin ? handleDelete : null}
+                    onEditName={handleEditName}
+                    isAdmin={isAdmin}
+                  />
+                </div>
+              }
+            />
+          </Routes>
+        </div>
+
+        {/* 🔔 GLOBAL NOTIFICATIONS */}
+        <Notification />
       </div>
-
-      <div className="header-bottom">
-        <nav className="header-nav">
-          <NavLink to="/employees" className={({ isActive }) => isActive ? 'active' : ''}>Сотрудники</NavLink>
-          <NavLink to="/shop" className={({ isActive }) => isActive ? 'active' : ''}>Товары</NavLink>
-          <NavLink to="/tables" className={({ isActive }) => isActive ? 'active' : ''}>Таблицы</NavLink>
-          <NavLink to="/about" className={({ isActive }) => isActive ? 'active' : ''}>О магазине</NavLink>
-           <NavLink to="/basket" className={({ isActive }) => isActive ? 'active' : ''}>Корзина</NavLink>
-        </nav>
-
-        <Button 
-  variant="outlined" 
-  color="error" 
-  onClick={handleLogout}
->
-  Выйти
-</Button>
-
-      </div>
-    </div>
-
-    {/* --- Контент --- */}
-    <div className="app-content">
-      <Routes>
-  <Route path="/" element={<Navigate to="/shop" replace />} />
-  
-  {/* Передаем addToBasket в Shop */}
-  <Route path="/shop" element={<Shop addToBasket={addToBasket} />} />
-
-  <Route path="/employees" element={
-    <div>
-      {isAdmin && <button onClick={handleAdd} className="add-btn">Добавить сотрудника</button>}
-      <Table employees={employees} onDelete={isAdmin ? handleDelete : null} onEditName={handleEditName} isAdmin={isAdmin} />
-    </div>
-  } />
-
-  <Route path="/tables" element={<Tables />} />
-  <Route path="/about" element={<About />} />
-
-  {/* Корзина получает basket и функцию удаления */}
-  <Route path="/basket" element={<Basket basketItems={basket} onRemove={handleRemoveFromBasket} />} />
-</Routes>
-
-    </div>
-
-  </div>
-</Router>
+    </Router>
   );
-}//
+}
 
 export default App;
