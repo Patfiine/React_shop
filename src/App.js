@@ -1,46 +1,37 @@
+// App.js
 import "./App.css";
 import React, { useState, useEffect } from "react";
-
 import { BrowserRouter as Router, Routes, Route, NavLink, Navigate } from "react-router-dom";
 import Button from "@mui/material/Button";
+import { useDispatch } from "react-redux";
+import { showNotification } from "./features/notification/notificationSlice";
 
-// pages
 import Shop from "./pages/Shop";
 import Tables from "./pages/Tables";
 import BasketPage from "./pages/BasketPage";
-
-// components
 import LoginForm from "./components/LoginForm";
 import Notification from "./components/Notification";
-
-// employees
 import EmployeeAPI from "./api/services";
 import Table from "./Table";
 
-// --- About page ---
-const About = () => {
-  return (
-    <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
-      <h2>О нашем магазине</h2>
-      <p>Добро пожаловать в систему управления магазином!</p>
-      <p>Здесь вы можете управлять сотрудниками и просматривать информацию о магазине.</p>
-      <ul>
-        <li>Просмотр списка сотрудников</li>
-        <li>Добавление сотрудников (администратор)</li>
-        <li>Редактирование данных</li>
-        <li>Удаление сотрудников</li>
-      </ul>
-    </div>
-  );
-};
+const About = () => (
+  <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
+    <h2>О нашем магазине</h2>
+    <p>Добро пожаловать в систему управления магазином!</p>
+    <ul>
+      <li>Просмотр списка сотрудников</li>
+      <li>Добавление сотрудников (администратор)</li>
+      <li>Редактирование данных</li>
+      <li>Удаление сотрудников</li>
+    </ul>
+  </div>
+);
 
 function App() {
-  // --- auth ---
+  const dispatch = useDispatch();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [user, setUser] = useState(null);
-
-  // --- employees ---
   const [employees, setEmployees] = useState([]);
 
   useEffect(() => {
@@ -56,8 +47,7 @@ function App() {
   }, []);
 
   const handleLogin = (adminStatus) => {
-    const username = adminStatus ? "admin" : "user";
-
+    const username = adminStatus ? "admin@gmail.com" : "user@gmail.com";
     setUser(username);
     setIsLoggedIn(true);
     setIsAdmin(adminStatus);
@@ -65,6 +55,14 @@ function App() {
 
     localStorage.setItem("user", username);
     localStorage.setItem("isAdmin", adminStatus);
+
+    dispatch(
+      showNotification({
+        message: adminStatus ? "Вход как администратор" : "Вход как пользователь",
+        type: "success",
+        duration: 3000
+      })
+    );
   };
 
   const handleLogout = () => {
@@ -75,16 +73,32 @@ function App() {
 
     localStorage.removeItem("user");
     localStorage.removeItem("isAdmin");
+
+    dispatch(
+      showNotification({
+        message: "Вы вышли из системы",
+        type: "info",
+        duration: 3000
+      })
+    );
   };
 
-  // --- employees actions ---
   const handleDelete = (id) => {
     if (!isAdmin) {
       alert("Только администратор может удалять сотрудников");
       return;
     }
+    const employee = employees.find((e) => e.number === id);
     EmployeeAPI.delete(id);
     setEmployees(EmployeeAPI.all());
+
+    dispatch(
+      showNotification({
+        message: `Сотрудник "${employee.name}" удалён`,
+        type: "info",
+        duration: 3000
+      })
+    );
   };
 
   const handleAdd = () => {
@@ -93,13 +107,17 @@ function App() {
       return;
     }
 
-    EmployeeAPI.add({
-      number: Date.now(),
-      name: "Новый сотрудник",
-      job: "Intern",
-    });
-
+    const newEmp = { number: Date.now(), name: "Новый сотрудник", job: "Intern" };
+    EmployeeAPI.add(newEmp);
     setEmployees(EmployeeAPI.all());
+
+    dispatch(
+      showNotification({
+        message: `Добавлен сотрудник "${newEmp.name}"`,
+        type: "success",
+        duration: 3000
+      })
+    );
   };
 
   const handleEditName = (id, newName) => {
@@ -108,9 +126,32 @@ function App() {
 
     EmployeeAPI.update(id, { ...employee, name: newName });
     setEmployees(EmployeeAPI.all());
+
+    dispatch(
+      showNotification({
+        message: `Имя сотрудника обновлено на "${newName}"`,
+        type: "success",
+        duration: 3000
+      })
+    );
   };
 
-  // --- auth guard ---
+  const handleEditJob = (id, newJob) => {
+    const employee = employees.find((e) => e.number === id);
+    if (!employee) return;
+
+    EmployeeAPI.update(id, { ...employee, job: newJob });
+    setEmployees(EmployeeAPI.all());
+
+    dispatch(
+      showNotification({
+        message: `Должность сотрудника обновлена на "${newJob}"`,
+        type: "success",
+        duration: 3000
+      })
+    );
+  };
+
   if (!isLoggedIn) {
     return <LoginForm onLogin={handleLogin} />;
   }
@@ -118,7 +159,6 @@ function App() {
   return (
     <Router>
       <div className="App">
-        {/* ===== HEADER ===== */}
         <div className="app-header">
           <div className="header-top">
             <h1 className="header-title">Shop Management System</h1>
@@ -143,16 +183,13 @@ function App() {
           </div>
         </div>
 
-        {/* ===== CONTENT ===== */}
         <div className="app-content">
           <Routes>
             <Route path="/" element={<Navigate to="/shop" replace />} />
-
             <Route path="/shop" element={<Shop />} />
             <Route path="/basket" element={<BasketPage />} />
             <Route path="/tables" element={<Tables />} />
             <Route path="/about" element={<About />} />
-
             <Route
               path="/employees"
               element={
@@ -166,6 +203,7 @@ function App() {
                     employees={employees}
                     onDelete={isAdmin ? handleDelete : null}
                     onEditName={handleEditName}
+                    onEditJob={handleEditJob}
                     isAdmin={isAdmin}
                   />
                 </div>
@@ -174,7 +212,6 @@ function App() {
           </Routes>
         </div>
 
-        {/* 🔔 GLOBAL NOTIFICATIONS */}
         <Notification />
       </div>
     </Router>

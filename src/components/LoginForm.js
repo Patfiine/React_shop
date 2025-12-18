@@ -17,16 +17,24 @@ const LoginForm = ({ onLogin }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    // Простая проверка логина/пароля
-    if (credentials.username === 'admin' && credentials.password === 'admin') {
-      onLogin(true);
-      setError('');
-    } else if (credentials.username === 'user' && credentials.password === 'user') {
-      onLogin(false);
+
+    if (!credentials.username.includes('@')) {
+      setError('Логин должен быть в формате email');
+      return;
+    }
+
+    if (credentials.password.length < 5 || credentials.password.length > 10) {
+      setError('Пароль должен быть от 5 до 10 символов');
+      return;
+    }
+
+    // передаем email + isAdmin
+    if (credentials.username === 'admin@gmail.com' && credentials.password === 'admin') {
+      onLogin(credentials.username, true); // email + админ
       setError('');
     } else {
-      setError('Неверный логин или пароль');
+      onLogin(credentials.username, false); // email + обычный пользователь
+      setError('');
     }
   };
 
@@ -34,9 +42,9 @@ const LoginForm = ({ onLogin }) => {
     <div className="login-container">
       <form className="login-form" onSubmit={handleSubmit}>
         <h2>Вход в систему</h2>
-        
+
         <div className="form-group">
-          <label htmlFor="username">Логин:</label>
+          <label htmlFor="username">Email:</label>
           <input
             type="text"
             id="username"
@@ -64,9 +72,8 @@ const LoginForm = ({ onLogin }) => {
         <button type="submit" className="login-btn">Войти</button>
 
         <div className="login-hint">
-          <p><strong>Тестовые аккаунты:</strong></p>
-          <p>Админ: admin / admin</p>
-          <p>Пользователь: user / user</p>
+          <p><strong>Тестовый аккаунт админа:</strong></p>
+          <p>Email: admin@gmail.com / Пароль: admin</p>
         </div>
       </form>
     </div>

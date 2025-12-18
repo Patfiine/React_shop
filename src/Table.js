@@ -1,34 +1,37 @@
+// Table.js
 import React, { useState } from 'react';
 import './Table.css';
 
-const Table = ({ employees, onDelete, onEditName, isAdmin }) => {
+const Table = ({ employees, onDelete, onEditName, onEditJob, isAdmin }) => {
   const [editingId, setEditingId] = useState(null);
+  const [editField, setEditField] = useState('');
   const [editValue, setEditValue] = useState('');
 
-  const handleEditClick = (employee) => {
+  const startEdit = (employee, field) => {
     setEditingId(employee.number);
-    setEditValue(employee.name);
+    setEditField(field);
+    setEditValue(field === 'name' ? employee.name : employee.job);
   };
 
-  const handleSaveClick = (id) => {
-    if (editValue.trim() !== '') {
+  const saveEdit = (id) => {
+    if (editValue.trim() === '') return;
+    if (editField === 'name') {
       onEditName(id, editValue.trim());
+    } else {
+      onEditJob(id, editValue.trim());
     }
-    setEditingId(null);
-    setEditValue('');
+    cancelEdit();
   };
 
-  const handleCancelClick = () => {
+  const cancelEdit = () => {
     setEditingId(null);
+    setEditField('');
     setEditValue('');
   };
 
   const handleKeyPress = (e, id) => {
-    if (e.key === 'Enter') {
-      handleSaveClick(id);
-    } else if (e.key === 'Escape') {
-      handleCancelClick();
-    }
+    if (e.key === 'Enter') saveEdit(id);
+    if (e.key === 'Escape') cancelEdit();
   };
 
   if (!employees || employees.length === 0) {
@@ -36,9 +39,7 @@ const Table = ({ employees, onDelete, onEditName, isAdmin }) => {
       <div className="table-container">
         <div className="no-data">
           <p>Нет данных о сотрудниках</p>
-          {isAdmin && (
-            <p>Нажмите "Добавить сотрудника" чтобы добавить первого сотрудника</p>
-          )}
+          {isAdmin && <p>Нажмите "Добавить сотрудника" чтобы добавить первого сотрудника</p>}
         </div>
       </div>
     );
@@ -56,75 +57,84 @@ const Table = ({ employees, onDelete, onEditName, isAdmin }) => {
           </tr>
         </thead>
         <tbody>
-          {employees.map((employee) => (
-            <tr key={employee.number} className="employee-row">
-              <td className="employee-id">{employee.number}</td>
-              
-             <td className="employee-name">
-  {editingId === employee.number ? (
-    <div className="edit-container">
-      <input
-        type="text"
-        value={editValue}
-        onChange={(e) => setEditValue(e.target.value)}
-        onKeyDown={(e) => handleKeyPress(e, employee.number)}
-        className="edit-input"
-        autoFocus
-        disabled={!isAdmin} // запрещаем ввод для обычного пользователя
-      />
-      {isAdmin && (
-        <div className="edit-actions">
-          <button 
-            onClick={() => handleSaveClick(employee.number)}
-            className="save-btn"
-            title="Сохранить"
-          >
-            ✓
-          </button>
-          <button 
-            onClick={handleCancelClick}
-            className="cancel-btn"
-            title="Отменить"
-          >
-            ✕
-          </button>
-        </div>
-      )}
-    </div>
-  ) : (
-    <div className="name-container">
-      <span>{employee.name}</span>
-      {isAdmin && (
-        <button 
-          onClick={() => handleEditClick(employee)}
-          className="edit-btn"
-          title="Редактировать имя"
-        >
-          ✏️
-        </button>
-      )}
-    </div>
-  )}
-</td>
+          {employees.map(emp => (
+            <tr key={emp.number} className="employee-row">
+              <td className="employee-id">{emp.number}</td>
 
-              
-              <td className="employee-job">{employee.job}</td>
-              
+              {/* Имя */}
+              <td className="employee-name">
+                {editingId === emp.number && editField === 'name' ? (
+                  <div className="edit-container">
+                    <input
+                      type="text"
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onKeyDown={(e) => handleKeyPress(e, emp.number)}
+                      className="edit-input"
+                      autoFocus
+                      disabled={!isAdmin}
+                    />
+                    {isAdmin && (
+                      <div className="edit-actions">
+                        <button onClick={() => saveEdit(emp.number)} className="save-btn">✓</button>
+                        <button onClick={cancelEdit} className="cancel-btn">✕</button>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="name-container">
+                    <span>{emp.name}</span>
+                    {isAdmin && (
+                      <button onClick={() => startEdit(emp, 'name')} className="edit-btn">✏️</button>
+                    )}
+                  </div>
+                )}
+              </td>
+
+              {/* Должность */}
+              <td className="employee-job">
+                {editingId === emp.number && editField === 'job' ? (
+                  <div className="edit-container">
+                    <input
+                      type="text"
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onKeyDown={(e) => handleKeyPress(e, emp.number)}
+                      className="edit-input"
+                      autoFocus
+                      disabled={!isAdmin}
+                    />
+                    {isAdmin && (
+                      <div className="edit-actions">
+                        <button onClick={() => saveEdit(emp.number)} className="save-btn">✓</button>
+                        <button onClick={cancelEdit} className="cancel-btn">✕</button>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="name-container">
+                    <span>{emp.job}</span>
+                    {isAdmin && (
+                      <button onClick={() => startEdit(emp, 'job')} className="edit-btn">✏️</button>
+                    )}
+                  </div>
+                )}
+              </td>
+
+              {/* Действия */}
               <td className="employee-actions">
-                {onDelete && (
-                  <button 
+                {isAdmin && onDelete ? (
+                  <button
                     onClick={() => {
-                      if (window.confirm(`Вы уверены, что хотите удалить сотрудника ${employee.name}?`)) {
-                        onDelete(employee.number);
+                      if (window.confirm(`Вы уверены, что хотите удалить сотрудника ${emp.name}?`)) {
+                        onDelete(emp.number);
                       }
                     }}
                     className="delete-btn"
-                    title="Удалить сотрудника"
                   >
                     🗑️
                   </button>
-                )}
-                {!onDelete && (
+                ) : (
                   <span className="no-permission">Только просмотр</span>
                 )}
               </td>
@@ -132,14 +142,13 @@ const Table = ({ employees, onDelete, onEditName, isAdmin }) => {
           ))}
         </tbody>
       </table>
-      
+
       <div className="table-info">
         <p>Всего сотрудников: {employees.length}</p>
-        {isAdmin && (
+        {isAdmin ? (
           <p className="admin-info">Режим администратора: полный доступ</p>
-        )}
-        {!isAdmin && (
-          <p className="user-info">Режим пользователя: только просмотр и редактирование имен</p>
+        ) : (
+          <p className="user-info">Режим пользователя: только просмотр и редактирование</p>
         )}
       </div>
     </div>
