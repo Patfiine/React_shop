@@ -1,4 +1,3 @@
-// App.js
 import "./App.css";
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, NavLink, Navigate } from "react-router-dom";
@@ -46,14 +45,14 @@ function App() {
     }
   }, []);
 
-  const handleLogin = (adminStatus) => {
-    const username = adminStatus ? "admin@gmail.com" : "user@gmail.com";
-    setUser(username);
+  // handleLogin теперь принимает email + adminStatus
+  const handleLogin = (email, adminStatus) => {
+    setUser(email);
     setIsLoggedIn(true);
     setIsAdmin(adminStatus);
     setEmployees(EmployeeAPI.all());
 
-    localStorage.setItem("user", username);
+    localStorage.setItem("user", email);
     localStorage.setItem("isAdmin", adminStatus);
 
     dispatch(
