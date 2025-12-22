@@ -1,5 +1,5 @@
 import "./App.css";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { BrowserRouter as Router, Routes, Route, NavLink, Navigate } from "react-router-dom";
 import Button from "@mui/material/Button";
 import { useDispatch } from "react-redux";
@@ -10,8 +10,8 @@ import Tables from "./pages/Tables";
 import BasketPage from "./pages/BasketPage";
 import LoginForm from "./components/LoginForm";
 import Notification from "./components/Notification";
-import EmployeeAPI from "./api/services";
 import Table from "./Table";
+import EmployeeAPI from "./api/services"; // <- axios сервис
 
 const About = () => (
   <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
@@ -33,6 +33,17 @@ function App() {
   const [user, setUser] = useState(null);
   const [employees, setEmployees] = useState([]);
 
+  // 🔹 fetchEmployees обернута в useCallback, чтобы ESLint не ругался
+  const fetchEmployees = useCallback(async () => {
+    try {
+      const data = await EmployeeAPI.all();
+      setEmployees(data);
+    } catch (err) {
+      console.error(err);
+      dispatch(showNotification({ message: "Ошибка загрузки сотрудников", type: "error", duration: 3000 }));
+    }
+  }, [dispatch]);
+
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
     const savedIsAdmin = localStorage.getItem("isAdmin");
@@ -41,27 +52,24 @@ function App() {
       setUser(savedUser);
       setIsLoggedIn(true);
       setIsAdmin(savedIsAdmin === "true");
-      setEmployees(EmployeeAPI.all());
+      fetchEmployees();
     }
-  }, []);
+  }, [fetchEmployees]);
 
-  // handleLogin теперь принимает email + adminStatus
   const handleLogin = (email, adminStatus) => {
     setUser(email);
     setIsLoggedIn(true);
     setIsAdmin(adminStatus);
-    setEmployees(EmployeeAPI.all());
+    fetchEmployees();
 
     localStorage.setItem("user", email);
     localStorage.setItem("isAdmin", adminStatus);
 
-    dispatch(
-      showNotification({
-        message: adminStatus ? "Вход как администратор" : "Вход как пользователь",
-        type: "success",
-        duration: 3000
-      })
-    );
+    dispatch(showNotification({
+      message: adminStatus ? "Вход как администратор" : "Вход как пользователь",
+      type: "success",
+      duration: 3000
+    }));
   };
 
   const handleLogout = () => {
@@ -73,87 +81,70 @@ function App() {
     localStorage.removeItem("user");
     localStorage.removeItem("isAdmin");
 
-    dispatch(
-      showNotification({
-        message: "Вы вышли из системы",
-        type: "info",
-        duration: 3000
-      })
-    );
+    dispatch(showNotification({ message: "Вы вышли из системы", type: "info", duration: 3000 }));
   };
 
-  const handleDelete = (id) => {
-    if (!isAdmin) {
-      alert("Только администратор может удалять сотрудников");
-      return;
+  const handleAdd = async () => {
+    if (!isAdmin) return alert("Только администратор может добавлять сотрудников");
+
+    const newEmp = { name: "Новый сотрудник", job: "Intern" };
+    try {
+      await EmployeeAPI.add(newEmp);
+      await fetchEmployees();
+      dispatch(showNotification({ message: `Добавлен сотрудник "${newEmp.name}"`, type: "success", duration: 3000 }));
+    } catch (err) {
+      console.error(err);
+      dispatch(showNotification({ message: "Ошибка при добавлении сотрудника", type: "error", duration: 3000 }));
     }
-    const employee = employees.find((e) => e.number === id);
-    EmployeeAPI.delete(id);
-    setEmployees(EmployeeAPI.all());
-
-    dispatch(
-      showNotification({
-        message: `Сотрудник "${employee.name}" удалён`,
-        type: "info",
-        duration: 3000
-      })
-    );
   };
 
-  const handleAdd = () => {
-    if (!isAdmin) {
-      alert("Только администратор может добавлять сотрудников");
-      return;
-    }
+  const handleDelete = async (id) => {
+    if (!isAdmin) return alert("Только администратор может удалять сотрудников");
 
-    const newEmp = { number: Date.now(), name: "Новый сотрудник", job: "Intern" };
-    EmployeeAPI.add(newEmp);
-    setEmployees(EmployeeAPI.all());
-
-    dispatch(
-      showNotification({
-        message: `Добавлен сотрудник "${newEmp.name}"`,
-        type: "success",
-        duration: 3000
-      })
-    );
-  };
-
-  const handleEditName = (id, newName) => {
-    const employee = employees.find((e) => e.number === id);
+    const employee = employees.find(e => e.id === id);
     if (!employee) return;
 
-    EmployeeAPI.update(id, { ...employee, name: newName });
-    setEmployees(EmployeeAPI.all());
+    if (!window.confirm(`Вы уверены, что хотите удалить сотрудника ${employee.name}?`)) return;
 
-    dispatch(
-      showNotification({
-        message: `Имя сотрудника обновлено на "${newName}"`,
-        type: "success",
-        duration: 3000
-      })
-    );
+    try {
+      await EmployeeAPI.delete(id);
+      await fetchEmployees();
+      dispatch(showNotification({ message: `Сотрудник "${employee.name}" удалён`, type: "info", duration: 3000 }));
+    } catch (err) {
+      console.error(err);
+      dispatch(showNotification({ message: "Ошибка при удалении сотрудника", type: "error", duration: 3000 }));
+    }
   };
 
-  const handleEditJob = (id, newJob) => {
-    const employee = employees.find((e) => e.number === id);
+  const handleEditName = async (id, newName) => {
+    const employee = employees.find(e => e.id === id);
     if (!employee) return;
 
-    EmployeeAPI.update(id, { ...employee, job: newJob });
-    setEmployees(EmployeeAPI.all());
-
-    dispatch(
-      showNotification({
-        message: `Должность сотрудника обновлена на "${newJob}"`,
-        type: "success",
-        duration: 3000
-      })
-    );
+    try {
+      await EmployeeAPI.update(id, { ...employee, name: newName });
+      await fetchEmployees();
+      dispatch(showNotification({ message: `Имя сотрудника обновлено на "${newName}"`, type: "success", duration: 3000 }));
+    } catch (err) {
+      console.error(err);
+      dispatch(showNotification({ message: "Ошибка при редактировании имени", type: "error", duration: 3000 }));
+    }
   };
 
-  if (!isLoggedIn) {
-    return <LoginForm onLogin={handleLogin} />;
-  }
+  const handleEditJob = async (id, newJob) => {
+    const employee = employees.find(e => e.id === id);
+    if (!employee) return;
+
+    try {
+      await EmployeeAPI.update(id, { ...employee, job: newJob });
+      await fetchEmployees();
+      dispatch(showNotification({ message: `Должность сотрудника обновлена на "${newJob}"`, type: "success", duration: 3000 }));
+    } catch (err) {
+      console.error(err);
+      dispatch(showNotification({ message: "Ошибка при редактировании должности", type: "error", duration: 3000 }));
+    }
+  };
+
+  if (!isLoggedIn) return <LoginForm onLogin={handleLogin} />;
 
   return (
     <Router>
@@ -176,9 +167,7 @@ function App() {
               <NavLink to="/basket">Корзина</NavLink>
             </nav>
 
-            <Button variant="outlined" color="error" onClick={handleLogout}>
-              Выйти
-            </Button>
+            <Button variant="outlined" color="error" onClick={handleLogout}>Выйти</Button>
           </div>
         </div>
 

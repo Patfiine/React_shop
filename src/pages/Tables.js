@@ -1,4 +1,4 @@
-// src/pages/Tables.js
+
 import React from "react";
 
 export default function Tables() {
